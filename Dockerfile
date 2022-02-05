@@ -8,11 +8,12 @@ COPY Pipfile* ./
 RUN pipenv install --deploy
 
 FROM base AS compile
-ARG APP_VERSION=$APP_VERSION
+
 ENV APP_VERSION=$APP_VERSION
 
 COPY plextraktsync ./plextraktsync/
-COPY plextraktsync.sh .
+COPY plextraktsync.sh ./
+
 # Create __version__ from $APP_VERSION
 RUN echo "__version__ = '${APP_VERSION:-unknown}'" > plextraktsync/__init__.py
 RUN cat plextraktsync/__init__.py
@@ -23,7 +24,6 @@ RUN python -m compileall .
 RUN chmod -R a+rX,g-w .
 
 FROM base
-ENTRYPOINT ["python", "-m", "plextraktsync"]
 
 ENV \
 	PTS_CONFIG_DIR=/app/config \
@@ -38,3 +38,5 @@ VOLUME /app/config
 COPY --from=build /root/.local/share/virtualenvs/app-*/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
 COPY --from=compile /app ./
 RUN ln -s /app/plextraktsync.sh /usr/bin/plextraktsync
+
+ENTRYPOINT ["python", "-m", "plextraktsync"]
