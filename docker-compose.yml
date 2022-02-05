@@ -1,6 +1,15 @@
+version: '2'
+
 services:
   plextraktsync:
     image: ghcr.io/taxel/plextraktsync
+    volumes:
+      - ./config:/app/config
+
+  plextraktsync-watch:
+    container_name: plextraktsync-watch
+    image: ghcr.io/taxel/plextraktsync
+    command: ["watch"]
     volumes:
       - ./config:/app/config
 
